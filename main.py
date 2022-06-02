@@ -10,6 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+
 # Cafe TABLE Configuration
 class Cafe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -81,7 +82,7 @@ def all_cafes():
 @app.route("/search", methods=["GET"])
 def search_cafe_at_location():
     query_location = request.args.get("loc")
-    cafe = db.session.query(Cafe).filter_by(location = query_location).first()
+    cafe = db.session.query(Cafe).filter_by(location=query_location).first()
     cafe_dict = {
         "id": cafe.id,
         "name": cafe.name,
@@ -96,16 +97,14 @@ def search_cafe_at_location():
         "coffee_price": cafe.coffee_price
     }
     if cafe:
-        return jsonify(cafe = cafe_dict)
+        return jsonify(cafe=cafe_dict)
     else:
         return jsonify(error={"Not Found": "Sorry, we don't have a cafe at that location."})
 
 
-
-
-
 # HTTP POST - Create Record
 
+# This route is ued to add a new cafe in the list
 @app.route("/add", methods=["POST"])
 def add_cafe():
     new_cafe = Cafe(
@@ -127,6 +126,17 @@ def add_cafe():
 
 # HTTP PUT/PATCH - Update Record
 
+# This route is used to update a specific record in a particular cafe
+@app.route("/update-price/<int:cafe_id>", methods=["PATCH", "GET"])
+def update_price(cafe_id):
+    new_price = request.args.get("new_price")
+    cafe = db.session.query(Cafe).get(cafe_id)
+    if cafe:
+        cafe.coffee_price = new_price
+        db.session.commit()
+        return jsonify(response={"success": "Successfully updated the price."}), 200
+    else:
+        return jsonify(response={"error": "Sorry a cafe with that id was not found in the database."}), 404
 
 
 ## HTTP DELETE - Delete Record
