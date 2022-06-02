@@ -28,7 +28,9 @@ class Cafe(db.Model):
 @app.route("/")
 def home():
     return render_template("index.html")
-    
+
+
+# HTTP GET - Read Record
 
 # This route is used to get a random cafe from the list
 @app.route("/random", methods=["GET"])
@@ -100,11 +102,32 @@ def search_cafe_at_location():
 
 
 
-## HTTP GET - Read Record
 
-## HTTP POST - Create Record
 
-## HTTP PUT/PATCH - Update Record
+# HTTP POST - Create Record
+
+@app.route("/add", methods=["POST"])
+def add_cafe():
+    new_cafe = Cafe(
+        name=request.form.get("name"),
+        map_url=request.form.get("map_url"),
+        img_url=request.form.get("img_url"),
+        location=request.form.get("location"),
+        has_sockets=bool(request.form.get("sockets")),
+        has_toilet=bool(request.form.get("toilet")),
+        has_wifi=bool(request.form.get("wifi")),
+        can_take_calls=bool(request.form.get("calls")),
+        seats=request.form.get("seats"),
+        coffee_price=request.form.get("coffee_price"),
+    )
+    db.session.add(new_cafe)
+    db.session.commit()
+    return jsonify(response={"success": "Successfully added the new cafe."})
+
+
+# HTTP PUT/PATCH - Update Record
+
+
 
 ## HTTP DELETE - Delete Record
 
